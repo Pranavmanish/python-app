@@ -90,8 +90,8 @@ pipeline {
                     withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
                         sh """
                             echo "[*] Updating container image in deployment..."
-                            kubectl --kubeconfig=$KUBECONFIG set image deployment/my-python-app my-python-app-container=${env.DOCKER_IMAGE} --namespace=$K8S_NAMESPACE
-                            kubectl --kubeconfig=$KUBECONFIG rollout status deployment/my-python-app --namespace=$K8S_NAMESPACE
+                            kubectl --kubeconfig=$KUBECONFIG set image deployment/mpython-app my-python-app-container=${env.DOCKER_IMAGE} --namespace=$K8S_NAMESPACE
+                            kubectl --kubeconfig=$KUBECONFIG rollout status deployment/python-app --namespace=$K8S_NAMESPACE
                         """
                     }
                 }

@@ -11,4 +11,4 @@ spec:
   ports:
     - protocol: TCP
       port: 80        # Exposed port
-      targetPort: 80  # Port your container listens on
+      targetPort: 5000  # Port your container listens on

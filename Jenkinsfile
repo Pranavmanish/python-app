@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git credentialsId: 'Github-cred', branch: 'main', url: 'https://github.com/Pranavmanish/python-survey-app.git' // Update with correct repo
+                git credentialsId: 'Github-cred', branch: 'main', url: 'https://github.com/Pranavmanish/python-app.git' 
             }
         }
 

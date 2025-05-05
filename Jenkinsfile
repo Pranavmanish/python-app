@@ -19,11 +19,11 @@ pipeline {
                     sh '''
                         echo "[*] Setting up virtual environment..."
                         python3 -m venv venv
-                        source venv/bin/activate
+                        . venv/bin/activate
                         pip install --upgrade pip
                         pip install -r requirements.txt
 
-                        echo "[*] Running app temporarily to validate startup..."
+                        echo "[*] Running Flask app (test)..."
                         python run.py &
                         APP_PID=$!
                         sleep 10

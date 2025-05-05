@@ -41,8 +41,8 @@ pipeline {
 
                     sh """
                         echo "[*] Building Docker image..."
-                        sudo docker build -t ${imageTag} .
-                        sudo docker tag ${imageTag} ${latestTag}
+                        docker build -t ${imageTag} .
+                        docker tag ${imageTag} ${latestTag}
                     """
 
                     env.DOCKER_IMAGE = imageTag

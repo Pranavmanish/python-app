@@ -87,7 +87,7 @@ pipeline {
                     withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
                         // Ensure deployment name matches the one in deployment.yaml
                         sh """
-                            kubectl --kubeconfig=$KUBECONFIG set image deployment/python-app my-springboot-app-container=${env.DOCKER_IMAGE} --namespace=$K8S_NAMESPACE
+                            kubectl --kubeconfig=$KUBECONFIG set image deployment/python-app python-app-container=${env.DOCKER_IMAGE} --namespace=$K8S_NAMESPACE
                             kubectl --kubeconfig=$KUBECONFIG rollout status deployment/python-app --namespace=$K8S_NAMESPACE
                         """
                     }

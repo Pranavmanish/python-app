@@ -77,7 +77,7 @@ pipeline {
                             kubectl --kubeconfig=$KUBECONFIG apply -f deployment.yaml --namespace=$K8S_NAMESPACE --validate=false
                             kubectl --kubeconfig=$KUBECONFIG apply -f service.yaml --namespace=$K8S_NAMESPACE --validate=false
                             echo "[*] Waiting for deployment to be ready..."
-                            kubectl --kubeconfig=$KUBECONFIG rollout status deployment/my-python-app --namespace=$K8S_NAMESPACE
+                            kubectl --kubeconfig=$KUBECONFIG rollout status deployment/my-python-app --namespace=$K8S_NAMESPACE --validate=false
 
                         '''
                     }

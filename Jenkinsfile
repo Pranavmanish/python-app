@@ -56,12 +56,12 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'Dockerhub-cred', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                         sh '''
                             echo "[*] Authenticating with DockerHub..."
-                            sudo docker logout || true
+                            docker logout || true
                             echo $DOCKER_PASSWORD | sudo docker login -u $DOCKER_USERNAME --password-stdin
 
                             echo "[*] Pushing Docker image..."
-                            sudo docker push ${DOCKER_IMAGE}
-                            sudo docker push ${DOCKER_IMAGE_BASE}:latest
+                            docker push ${DOCKER_IMAGE}
+                            docker push ${DOCKER_IMAGE_BASE}:latest
                         '''
                     }
                 }

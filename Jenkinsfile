@@ -74,8 +74,8 @@ pipeline {
                     withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
                         sh '''
                             echo "[*] Applying Kubernetes manifests..."
-                            kubectl --kubeconfig=$KUBECONFIG apply -f deployment.yaml --namespace=$K8S_NAMESPACE --validate=false
-                            kubectl --kubeconfig=$KUBECONFIG apply -f service.yaml --namespace=$K8S_NAMESPACE --validate=false
+                            kubectl --kubeconfig=$KUBECONFIG -f apply deployment.yaml --namespace=$K8S_NAMESPACE --validate=false
+                            kubectl --kubeconfig=$KUBECONFIG -f apply service.yaml --namespace=$K8S_NAMESPACE --validate=false
                             echo "[*] Waiting for deployment to be ready..."
                             kubectl --kubeconfig=$KUBECONFIG rollout status deployment/python-app --namespace=$K8S_NAMESPACE 
                         '''
@@ -91,7 +91,7 @@ pipeline {
                         sh """
                             echo "[*] Updating container image in deployment..."
                             kubectl --kubeconfig=$KUBECONFIG set image deployment/python-app python-app-container=${env.DOCKER_IMAGE} --namespace=$K8S_NAMESPACE
-                            
+                            kubectl --kubeconfig=$KUBECONFIG rollout status deployment/python-app --namespace=$K8S_NAMESPACE
                         """
                     }
                 }

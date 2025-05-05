@@ -1,24 +1,34 @@
 pipeline {
     agent any
+
     environment {
-        DOCKER_IMAGE_BASE = 'pranav1706/my-python-app' // Update Docker image name
-        K8S_NAMESPACE = 'default' // Kubernetes namespace
+        DOCKER_IMAGE_BASE = 'pranav1706/python-app'  
+        K8S_NAMESPACE = 'default'
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git credentialsId: 'Github-cred', branch: 'main', url: 'https://github.com/Pranavmanish/python-app.git' // Update repo URL
+                git credentialsId: 'Github-cred', branch: 'main', url: 'https://github.com/Pranavmanish/python-survey-app.git' // Update with correct repo
             }
         }
 
-        stage('Build & Test Python Application') {
+        stage('Build & Test Flask App') {
             steps {
                 script {
-                    // Optional: install dependencies and run tests if needed
-                    sh 'pip install -r requirements.txt'
-                    // Uncomment below if you have tests
-                    // sh 'pytest tests/'
+                    sh '''
+                        echo "[*] Setting up virtual environment..."
+                        python3 -m venv venv
+                        source venv/bin/activate
+                        pip install --upgrade pip
+                        pip install -r requirements.txt
+
+                        echo "[*] Running app temporarily to validate startup..."
+                        python run.py &
+                        APP_PID=$!
+                        sleep 10
+                        kill $APP_PID || true
+                    '''
                 }
             }
         }
@@ -29,11 +39,12 @@ pipeline {
                     def imageTag = "${DOCKER_IMAGE_BASE}:${env.BUILD_NUMBER}"
                     def latestTag = "${DOCKER_IMAGE_BASE}:latest"
 
-                    // Build Docker image
-                    sh "docker build --no-cache -t ${imageTag} ."
-                    sh "docker tag ${imageTag} ${latestTag}"
+                    sh """
+                        echo "[*] Building Docker image..."
+                        docker build -t ${imageTag} .
+                        docker tag ${imageTag} ${latestTag}
+                    """
 
-                    // Save image tag for deployment
                     env.DOCKER_IMAGE = imageTag
                 }
             }
@@ -43,11 +54,15 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'Dockerhub-cred', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        sh "docker logout"
-                        sh "echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin"
+                        sh '''
+                            echo "[*] Authenticating with DockerHub..."
+                            docker logout || true
+                            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
 
-                        sh "docker push ${env.DOCKER_IMAGE}"
-                        sh "docker push ${DOCKER_IMAGE_BASE}:latest"
+                            echo "[*] Pushing Docker image..."
+                            docker push ${DOCKER_IMAGE}
+                            docker push ${DOCKER_IMAGE_BASE}:latest
+                        '''
                     }
                 }
             }
@@ -58,6 +73,7 @@ pipeline {
                 script {
                     withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
                         sh '''
+                            echo "[*] Applying Kubernetes manifests..."
                             kubectl --kubeconfig=$KUBECONFIG apply -f deployment.yaml --namespace=$K8S_NAMESPACE
                             kubectl --kubeconfig=$KUBECONFIG apply -f service.yaml --namespace=$K8S_NAMESPACE
                         '''
@@ -71,6 +87,7 @@ pipeline {
                 script {
                     withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
                         sh """
+                            echo "[*] Updating container image in deployment..."
                             kubectl --kubeconfig=$KUBECONFIG set image deployment/my-python-app my-python-app-container=${env.DOCKER_IMAGE} --namespace=$K8S_NAMESPACE
                             kubectl --kubeconfig=$KUBECONFIG rollout status deployment/my-python-app --namespace=$K8S_NAMESPACE
                         """
@@ -82,10 +99,10 @@ pipeline {
 
     post {
         success {
-            echo 'Python App Deployed Successfully!'
+            echo '✅ Python Survey App Deployed Successfully!'
         }
         failure {
-            echo 'Python App Deployment Failed'
+            echo '❌ Deployment Failed.'
         }
     }
 }

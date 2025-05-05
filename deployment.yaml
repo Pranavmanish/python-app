@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: python-app-container
-        image: nginx:latest
+        image:  pranav1706/python-app:latest
         ports:
         - containerPort: 80

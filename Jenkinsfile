@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git credentialsId: 'Github-cred', branch: 'main', url: 'https://github.com/Pranavmanish/python-app.git' 
+                git credentialsId: 'Github-cred', branch: 'main', url: 'https://github.com/Pranavmanish/python-app.git'
             }
         }
 
@@ -41,8 +41,8 @@ pipeline {
 
                     sh """
                         echo "[*] Building Docker image..."
-                        docker build -t ${imageTag} .
-                        docker tag ${imageTag} ${latestTag}
+                        sudo docker build -t ${imageTag} .
+                        sudo docker tag ${imageTag} ${latestTag}
                     """
 
                     env.DOCKER_IMAGE = imageTag
@@ -56,12 +56,12 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'Dockerhub-cred', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                         sh '''
                             echo "[*] Authenticating with DockerHub..."
-                            docker logout || true
-                            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+                            sudo docker logout || true
+                            echo $DOCKER_PASSWORD | sudo docker login -u $DOCKER_USERNAME --password-stdin
 
                             echo "[*] Pushing Docker image..."
-                            docker push ${DOCKER_IMAGE}
-                            docker push ${DOCKER_IMAGE_BASE}:latest
+                            sudo docker push ${DOCKER_IMAGE}
+                            sudo docker push ${DOCKER_IMAGE_BASE}:latest
                         '''
                     }
                 }

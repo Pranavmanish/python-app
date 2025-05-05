@@ -91,7 +91,7 @@ pipeline {
                         sh """
                             echo "[*] Updating container image in deployment..."
                             kubectl --kubeconfig=$KUBECONFIG set image deployment/python-app python-app-container=${env.DOCKER_IMAGE} --namespace=$K8S_NAMESPACE
-                            kubectl --kubeconfig=$KUBECONFIG rollout status deployment/python-app --namespace=$K8S_NAMESPACE
+                            
                         """
                     }
                 }

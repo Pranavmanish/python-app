@@ -72,12 +72,31 @@ def get_surveys():
 
 @routes.route("/survey/<int:id>", methods=["PUT"])
 def update_survey(id):
-    data = request.json
+    data = request.get_json()
     survey = Survey.query.get_or_404(id)
-    for key, value in data.items():
-        setattr(survey, key, value)
+
+    # List of updatable fields
+    updatable_fields = [
+        "first_name", "last_name", "street_address", "city", "state",
+        "zip_code", "telephone_number", "email", "interest_source",
+        "recommendation_likelihood", "additional_comments"
+    ]
+
+    # Update only the allowed fields
+    for field in updatable_fields:
+        if field in data:
+            setattr(survey, field, data[field])
+
+    # Handle date separately
+    if 'date_of_survey' in data:
+        try:
+            survey.date_of_survey = datetime.strptime(data['date_of_survey'], '%Y-%m-%d').date()
+        except ValueError:
+            return jsonify({"error": "Invalid date format. Use YYYY-MM-DD."}), 400
+
     db.session.commit()
-    return jsonify({"message": "Survey updated"})
+    return jsonify({"message": "Survey updated"}), 200
+
 
 @routes.route("/survey/<int:id>", methods=["DELETE"])
 def delete_survey(id):

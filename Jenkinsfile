@@ -57,7 +57,7 @@ pipeline {
                         sh '''
                             echo "[*] Authenticating with DockerHub..."
                             docker logout || true
-                            docker login -u $DOCKER_USERNAME --password-stdin $DOCKER_PASSWORD
+                            docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
 
                             echo "[*] Pushing Docker image..."
                             docker push ${DOCKER_IMAGE}

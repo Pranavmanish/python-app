@@ -5,7 +5,7 @@ import os
 
 
 
-# TEMP: Fallback for testing
+
 if not os.getenv("DATABASE_URI"):
     os.environ["DATABASE_URI"] = "mysql+pymysql://admin:Pranav.1719@database-3.cn0oeqcmw45v.us-east-1.rds.amazonaws.com:3306/surveydb2"
 
